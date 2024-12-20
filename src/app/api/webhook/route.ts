@@ -34,15 +34,17 @@ export async function POST(req: Request) {
 }
 
 function verifySignature(body: string, signature?: string | null) {
-  if (!signature || !process.env.WEBHOOK_SECRET) return false;
+    const WEBHOOK_SECRET = "11"; // استبدل هذا بمفتاحك السري
+    if (!signature) return false;
   
-  const hmac = crypto
-    .createHmac('sha256', process.env.WEBHOOK_SECRET)
-    .update(body)
-    .digest('hex');
-    
-  return crypto.timingSafeEqual(
-    Buffer.from(signature),
-    Buffer.from(hmac)
-  );
-}
+    const hmac = crypto
+      .createHmac('sha256', WEBHOOK_SECRET)
+      .update(body)
+      .digest('hex');
+      
+    return crypto.timingSafeEqual(
+      Buffer.from(signature),
+      Buffer.from(hmac)
+    );
+  }
+  
