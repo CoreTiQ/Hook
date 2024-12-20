@@ -1,44 +1,43 @@
-// src/app/page.tsx
-'use client'
+'use client';
 
-import { useEffect, useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Loader2, AlertCircle, CheckCircle, Info, AlertTriangle } from 'lucide-react'
-import { supabase } from '@/lib/supabase'
+import { useEffect, useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Loader2, AlertCircle, CheckCircle, Info, AlertTriangle } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 
 interface Message {
-  id: string
-  type: 'success' | 'error' | 'info' | 'warning' | 'discord'
-  title: string
-  message: string
-  metadata?: any
-  created_at: string
+  id: string;
+  type: 'success' | 'error' | 'info' | 'warning' | 'discord';
+  title: string;
+  message: string;
+  metadata?: any;
+  created_at: string;
 }
 
 export default function Home() {
-  const [messages, setMessages] = useState<Message[]>([])
-  const [loading, setLoading] = useState(true)
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchMessages()
-    setupRealtimeSubscription()
-  }, [])
+    fetchMessages();
+    setupRealtimeSubscription();
+  }, []);
 
   const fetchMessages = async () => {
     try {
       const { data } = await supabase
         .from('webhook_messages')
         .select('*')
-        .order('created_at', { ascending: false })
+        .order('created_at', { ascending: false });
       
-      setMessages(data || [])
-      setLoading(false)
+      setMessages(data || []);
+      setLoading(false);
     } catch (error) {
-      console.error('Error:', error)
-      setLoading(false)
+      console.error('Error:', error);
+      setLoading(false);
     }
-  }
+  };
 
   const setupRealtimeSubscription = () => {
     const channel = supabase
@@ -46,33 +45,33 @@ export default function Home() {
       .on('postgres_changes', 
         { event: 'INSERT', schema: 'public', table: 'webhook_messages' },
         payload => {
-          setMessages(prev => [payload.new as Message, ...prev])
+          setMessages(prev => [payload.new as Message, ...prev]);
         }
       )
-      .subscribe()
+      .subscribe();
 
     return () => {
-      supabase.removeChannel(channel)
-    }
-  }
+      supabase.removeChannel(channel);
+    };
+  };
 
   const getMessageIcon = (type: string) => {
     switch (type) {
-      case 'success': return <CheckCircle className="h-6 w-6 text-green-500" />
-      case 'error': return <AlertCircle className="h-6 w-6 text-red-500" />
-      case 'warning': return <AlertTriangle className="h-6 w-6 text-yellow-500" />
-      case 'info': default: return <Info className="h-6 w-6 text-blue-500" />
+      case 'success': return <CheckCircle className="h-6 w-6 text-green-500" />;
+      case 'error': return <AlertCircle className="h-6 w-6 text-red-500" />;
+      case 'warning': return <AlertTriangle className="h-6 w-6 text-yellow-500" />;
+      case 'info': default: return <Info className="h-6 w-6 text-blue-500" />;
     }
-  }
+  };
 
   const getMessageStyle = (type: string) => {
     switch (type) {
-      case 'success': return 'border-l-4 border-l-green-500 bg-green-50'
-      case 'error': return 'border-l-4 border-l-red-500 bg-red-50'
-      case 'warning': return 'border-l-4 border-l-yellow-500 bg-yellow-50'
-      case 'info': default: return 'border-l-4 border-l-blue-500 bg-blue-50'
+      case 'success': return 'border-l-4 border-l-green-500 bg-green-50';
+      case 'error': return 'border-l-4 border-l-red-500 bg-red-50';
+      case 'warning': return 'border-l-4 border-l-yellow-500 bg-yellow-50';
+      case 'info': default: return 'border-l-4 border-l-blue-500 bg-blue-50';
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4 sm:p-8">
@@ -146,5 +145,5 @@ export default function Home() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
