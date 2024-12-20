@@ -6,26 +6,10 @@ import crypto from 'crypto';
 const ALLOWED_TYPES = ['success', 'error', 'warning', 'info'] as const;
 type WebhookType = typeof ALLOWED_TYPES[number];
 
-// التحقق من وجود المفتاح السري
-const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET;
-if (!WEBHOOK_SECRET) {
-  console.error('WEBHOOK_SECRET is not set');
-}
-
 export async function POST(req: Request) {
   try {
-    // التحقق من التوقيع
-    const signature = req.headers.get('x-webhook-signature');
+    // تحليل البيانات مباشرة
     const body = await req.text();
-    
-    if (!verifySignature(body, signature)) {
-      return NextResponse.json(
-        { error: 'Invalid signature', message: 'Invalid or missing webhook signature' }, 
-        { status: 401 }
-      );
-    }
-
-    // تحليل البيانات
     const data = JSON.parse(body);
     
     // التحقق من البيانات المطلوبة
@@ -79,33 +63,4 @@ export async function POST(req: Request) {
       { status: 500 }
     );
   }
-}
-
-function verifySignature(body: string, signature?: string | null): boolean {
-  if (!signature || !WEBHOOK_SECRET) return false;
-  
-  try {
-    const hmac = crypto
-      .createHmac('sha256', WEBHOOK_SECRET)
-      .update(body)
-      .digest('hex');
-      
-    return crypto.timingSafeEqual(
-      Buffer.from(signature),
-      Buffer.from(hmac)
-    );
-  } catch {
-    return false;
-  }
-}
-
-// دالة مساعدة لتوليد التوقيع (مفيدة للاختبار)
-export function generateSignature(payload: any): string {
-  if (!WEBHOOK_SECRET) throw new Error('WEBHOOK_SECRET is not set');
-  
-  const body = JSON.stringify(payload);
-  return crypto
-    .createHmac('sha256', WEBHOOK_SECRET)
-    .update(body)
-    .digest('hex');
 }
