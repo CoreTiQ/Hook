@@ -1,39 +1,44 @@
-// src/lib/supabase.ts
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://bsruyzcvixmowxdkygtk.supabase.co';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJzcnV5emN2aXhtb3d4ZGt5Z3RrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ2OTQ0MDgsImV4cCI6MjA1MDI3MDQwOH0.LzvE_Dy1JbldyNYGgknUdTC4gp4Pltt8MH0YLJ8IrZI';
-
-// التحقق من وجود المتغيرات المطلوبة
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables');
-}
-
-// إنشاء عميل Supabase
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    autoRefreshToken: false,
-    persistSession: false,
-    detectSessionInUrl: false
-  }
-});
-
-// دالة للتحقق من الاتصال
-export async function checkSupabaseConnection() {
-  try {
-    const { data, error } = await supabase
-      .from('webhook_messages')
-      .select('count')
-      .limit(1);
-
-    if (error) {
-      console.error('Supabase connection error:', error);
-      return false;
+// route.ts
+export async function POST(req: Request) {
+    try {
+      const body = await req.text();
+      const data = JSON.parse(body);
+      
+      // إضافة البيانات لقاعدة البيانات
+      const { data: message, error } = await supabase
+        .from('webhook_messages')
+        .insert([{
+          type: data.type || 'embed',
+          title: data.title,
+          description: data.description,
+          url: data.url,
+          color: data.color,
+          author_name: data.author_name,
+          author_icon_url: data.author_icon_url,
+          thumbnail_url: data.thumbnail_url,
+          image_url: data.image_url,
+          footer_text: data.footer_text,
+          footer_icon_url: data.footer_icon_url,
+          fields: data.fields || [],
+          timestamp: data.timestamp || new Date().toISOString()
+        }])
+        .select()
+        .single();
+  
+      if (error) throw error;
+  
+      return NextResponse.json({
+        success: true,
+        data: message
+      }, { 
+        status: 201 
+      });
+  
+    } catch (error) {
+      console.error('Webhook error:', error);
+      return NextResponse.json(
+        { error: 'Internal server error', details: error.message },
+        { status: 500 }
+      );
     }
-
-    return true;
-  } catch (error) {
-    console.error('Supabase check failed:', error);
-    return false;
   }
-}
