@@ -13,29 +13,14 @@ interface Message {
   created_at: string
 }
 
+// src/app/page.tsx
 export default function Home() {
-  const [messages, setMessages] = useState<Message[]>([])
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    fetchMessages()
-    setupRealtimeSubscription()
-  }, [])
-
-  const fetchMessages = async () => {
-    try {
-      const { data } = await supabase
-        .from('webhook_messages')
-        .select('*')
-        .order('created_at', { ascending: false })
-      
-      setMessages(data || [])
-      setLoading(false)
-    } catch (error) {
-      console.error('Error:', error)
-      setLoading(false)
-    }
-  }
+  return (
+    <div className="p-8">
+      <h1 className="text-2xl font-bold">لوحة رسائل Webhook</h1>
+    </div>
+  );
+}
 
   const setupRealtimeSubscription = () => {
     const channel = supabase
