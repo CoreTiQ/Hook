@@ -1,7 +1,15 @@
+// src/app/layout.tsx
 import './globals.css'
-import Sidebar from '@/components/Sidebar'
-import Header from '@/components/Header'
+import type { Metadata } from 'next'
+import { Inter } from 'next/font/google'
 import { ThemeProvider } from '@/components/providers/theme-provider'
+
+const inter = Inter({ subsets: ['latin', 'arabic'] })
+
+export const metadata: Metadata = {
+  title: 'Webhook Dashboard',
+  description: 'عرض وإدارة رسائل Webhook',
+}
 
 export default function RootLayout({
   children,
@@ -10,18 +18,15 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ar" dir="rtl" suppressHydrationWarning>
-      <body>
-        <ThemeProvider>
-          <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
-            <div className="flex h-screen">
-              <Sidebar />
-              <div className="flex-1 flex flex-col overflow-hidden">
-                <Header />
-                <main className="flex-1 overflow-y-auto">
-                  {children}
-                </main>
-              </div>
-            </div>
+      <body className={inter.className}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <div className="min-h-screen bg-background">
+            {children}
           </div>
         </ThemeProvider>
       </body>
