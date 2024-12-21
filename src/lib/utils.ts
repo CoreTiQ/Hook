@@ -2,14 +2,9 @@
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 
-/**
- * دمج الـ classes مع دعم Tailwind CSS
- * يستخدم clsx لدمج الـ classes وtwMerge لدمج classes الـ Tailwind
- */
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
-
 /**
  * تنسيق التاريخ بالصيغة العربية
  */
