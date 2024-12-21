@@ -1,12 +1,6 @@
 // src/app/layout.tsx
 import './globals.css'
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
-
-const inter = Inter({ 
-  subsets: ['latin'],
-  display: 'swap',
-})
 
 export const metadata: Metadata = {
   title: 'Webhook Dashboard',
@@ -20,7 +14,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ar" dir="rtl">
-      <body className={inter.className}>
+      <body>
         <div className="min-h-screen bg-gray-50">
           {children}
         </div>
